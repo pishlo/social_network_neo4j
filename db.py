@@ -18,7 +18,6 @@ class Database:
                 lambda tx: [record for record in tx.run(query, parameters or {})]
             )
 
-
     def create_user(self, username: str, name: str) -> None:
         query = """
         CREATE (u:User {username: $username, name: $name})
@@ -97,7 +96,7 @@ class Database:
         MATCH (follower:User)-[:FOLLOWS]->(u:User {username: $username})
         RETURN follower
         """
-        result = self.execute_read({"username": username}, query)
+        result = self.execute_read(query, {"username": username})
         return [{
             "id": record["follower"].element_id,
             "username": record["follower"]["username"],
@@ -114,4 +113,18 @@ class Database:
             "id": record["following"].element_id,
             "username": record["following"]["username"],
             "name": record["following"]["name"]
+        } for record in result]
+
+    def get_feed(self, username: str) -> List[dict]:
+        query = """
+        MATCH (me:User {username: $username})-[:FOLLOWS]->(author:User)-[:POSTED]->(p:Post)
+        RETURN p, author
+        ORDER BY p.timestamp DESC
+        """
+        result = self.execute_read(query, {"username": username})
+        return [{
+            "content": record["p"]["content"],
+            "timestamp": record["p"]["timestamp"],
+            "username": record["author"]["username"],
+            "name": record["author"]["name"]
         } for record in result]
