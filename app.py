@@ -1,6 +1,6 @@
 # social_network.py
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-import sqlite3
+from db import Database
 from dataclasses import dataclass
 from typing import List, Optional
 

@@ -1,4 +1,4 @@
-#!/home/elie/twitter/env/bin/python3
+#!/Users/skozaliev/Desktop/uni/nosql/social_network_neo4j/env/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys
