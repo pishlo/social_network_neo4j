@@ -35,7 +35,7 @@ class Database:
             return None
         user = result[0]["u"]
         return {
-            "id": user.element_id,  # Neo4j's internal string ID
+            "id": user.element_id,
             "username": user["username"],
             "name": user["name"]
         }
@@ -49,6 +49,28 @@ class Database:
         result = self.execute_read(query)
         return [{
             "id": record["u"].element_id,
+            "username": record["u"]["username"],
+            "name": record["u"]["name"]
+        } for record in result]
+    
+    def create_post(self, username: str, content: str) -> None:
+        query = """
+        MATCH (u:User {username: $username})
+        CREATE (p:Post {content: $content, timestamp: datetime()})
+        CREATE (u)-[:POSTED]->(p)
+        """
+        self.execute_write(query, {"username": username, "content": content})
+
+    def get_posts_by_user(self, username: str) -> List[dict]:
+        query = """
+        MATCH (u:User {username: $username})-[:POSTED]->(p:Post)
+        RETURN p, u
+        ORDER BY p.timestamp DESC
+        """
+        result = self.execute_read(query, {"username": username})
+        return [{
+            "content": record["p"]["content"],
+            "timestamp": record["p"]["timestamp"],
             "username": record["u"]["username"],
             "name": record["u"]["name"]
         } for record in result]
