@@ -213,11 +213,11 @@
             <div class="profile-info">
                 <h1>{{ user.name }}</h1>
                 <div class="profile-username">@{{ user.username }}</div>
-                {% if current_user and current_user.id != user.id %}
+                {% if current_user and current_user.username != user.username %}
                 <div class="profile-actions">
                     <form action="{{ url_for('follow') }}" method="post">
-                        <input type="hidden" name="follower_id" value="{{ current_user.id }}">
-                        <input type="hidden" name="followee_id" value="{{ user.id }}">
+                        <input type="hidden" name="follower_username" value="{{ current_user.username }}">
+                        <input type="hidden" name="followee_username" value="{{ user.username }}">
                         {% if is_following %}
                         <button type="submit" class="btn btn-danger">Unfollow</button>
                         {% else %}
@@ -246,16 +246,16 @@
 
         <div class="nav-links">
             <a href="{{ url_for('home') }}">← Back to all users</a>
-            {% if current_user and current_user.id == user.id %}
-            <a href="{{ url_for('user_feed', user_id=user.id) }}">View your feed</a>
+            {% if current_user and current_user.username == user.username %}
+            <a href="{{ url_for('user_feed', username=user.username) }}">View your feed</a>
             {% endif %}
         </div>
 
-        {% if current_user and current_user.id == user.id %}
+        {% if current_user and current_user.username == user.username %}
         <div class="post-form">
             <h2>Create Post</h2>
             <form action="{{ url_for('create_post') }}" method="post">
-                <input type="hidden" name="user_id" value="{{ user.id }}">
+                <input type="hidden" name="username" value="{{ user.username }}">
                 <textarea name="content" placeholder="What's on your mind?" required></textarea>
                 <button type="submit" class="btn btn-primary">Post</button>
             </form>
@@ -285,7 +285,7 @@
                 <div class="user-list">
                     {% for follower in followers %}
                     <div class="user-card">
-                        <h3><a href="{{ url_for('user_profile', user_id=follower.id) }}">{{ follower.name }}</a></h3>
+                        <h3><a href="{{ url_for('user_profile', username=follower.username) }}">{{ follower.name }}</a></h3>
                         <p>@{{ follower.username }}</p>
                     </div>
                     {% endfor %}
@@ -301,7 +301,7 @@
                 <div class="user-list">
                     {% for followee in following %}
                     <div class="user-card">
-                        <h3><a href="{{ url_for('user_profile', user_id=followee.id) }}">{{ followee.name }}</a></h3>
+                        <h3><a href="{{ url_for('user_profile', username=followee.username) }}">{{ followee.name }}</a></h3>
                         <p>@{{ followee.username }}</p>
                     </div>
                     {% endfor %}

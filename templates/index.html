@@ -171,8 +171,8 @@
             <h2>Welcome back, {{ current_user.name }}!</h2>
             <p>What would you like to do today?</p>
             <div class="user-actions">
-                <a href="{{ url_for('user_profile', user_id=current_user.id) }}" class="btn btn-primary">My Profile</a>
-                <a href="{{ url_for('user_feed', user_id=current_user.id) }}" class="btn btn-success">My Feed</a>
+                <a href="{{ url_for('user_profile', username=current_user.username) }}" class="btn btn-primary">My Profile</a>
+                <a href="{{ url_for('user_feed', username=current_user.username) }}" class="btn btn-success">My Feed</a>
             </div>
         </div>
         {% else %}
@@ -186,9 +186,9 @@
                 <h3>{{ user.name }}</h3>
                 <p>@{{ user.username }}</p>
                 <div class="user-actions">
-                    <a href="{{ url_for('user_profile', user_id=user.id) }}" class="btn btn-primary">View Profile</a>
+                    <a href="{{ url_for('user_profile', username=user.username) }}" class="btn btn-primary">View Profile</a>
                     {% if not current_user or current_user.id != user.id %}
-                    <a href="{{ url_for('login', user_id=user.id) }}" class="btn btn-success">Login as</a>
+                    <a href="{{ url_for('login', username=user.username) }}" class="btn btn-success">Login as</a>
                     {% endif %}
                 </div>
             </div>

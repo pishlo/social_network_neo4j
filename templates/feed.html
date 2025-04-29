@@ -149,7 +149,7 @@
 
     <div class="container">
         <div class="nav-links">
-            <a href="{{ url_for('user_profile', user_id=user.id) }}">← Back to profile</a>
+            <a href="{{ url_for('user_profile', username=user.username) }}">← Back to profile</a>
             <a href="{{ url_for('home') }}">View all users</a>
         </div>
 

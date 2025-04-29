@@ -14,10 +14,10 @@ class Database:
 
     def execute_read(self, query, parameters=None):
         with self.driver.session() as session:
-            result = session.execute_read(lambda tx: tx.run(query, parameters or {}))
-            return [record for record in result]
+            return session.execute_read(
+                lambda tx: [record for record in tx.run(query, parameters or {})]
+            )
 
-    # === Task 4: User operations using Cypher ===
 
     def create_user(self, username: str, name: str) -> None:
         query = """
@@ -52,7 +52,7 @@ class Database:
             "username": record["u"]["username"],
             "name": record["u"]["name"]
         } for record in result]
-    
+
     def create_post(self, username: str, content: str) -> None:
         query = """
         MATCH (u:User {username: $username})
@@ -73,4 +73,45 @@ class Database:
             "timestamp": record["p"]["timestamp"],
             "username": record["u"]["username"],
             "name": record["u"]["name"]
+        } for record in result]
+
+    def follow_user(self, follower_username: str, followee_username: str) -> bool:
+        query = """
+        MATCH (follower:User {username: $follower})
+        MATCH (followee:User {username: $followee})
+        MERGE (follower)-[:FOLLOWS]->(followee)
+        """
+        self.execute_write(query, {"follower": follower_username, "followee": followee_username})
+        return True
+
+    def unfollow_user(self, follower_username: str, followee_username: str) -> bool:
+        query = """
+        MATCH (follower:User {username: $follower})-[r:FOLLOWS]->(followee:User {username: $followee})
+        DELETE r
+        """
+        self.execute_write(query, {"follower": follower_username, "followee": followee_username})
+        return True
+
+    def get_followers(self, username: str) -> List[dict]:
+        query = """
+        MATCH (follower:User)-[:FOLLOWS]->(u:User {username: $username})
+        RETURN follower
+        """
+        result = self.execute_read({"username": username}, query)
+        return [{
+            "id": record["follower"].element_id,
+            "username": record["follower"]["username"],
+            "name": record["follower"]["name"]
+        } for record in result]
+
+    def get_following(self, username: str) -> List[dict]:
+        query = """
+        MATCH (u:User {username: $username})-[:FOLLOWS]->(following:User)
+        RETURN following
+        """
+        result = self.execute_read(query, {"username": username})
+        return [{
+            "id": record["following"].element_id,
+            "username": record["following"]["username"],
+            "name": record["following"]["name"]
         } for record in result]
